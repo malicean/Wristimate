@@ -14,12 +14,15 @@ namespace Wristimate
         private readonly Canvas _popup;
         private readonly TextMesh _amountText;
         private readonly TextMesh _caliberText;
+
+        private readonly ConfigEntry<bool> _enabled;
         
         private readonly ConfigEntry<float> _totalScale;
         private readonly ConfigEntry<float> _totalOffset;
         private readonly ConfigEntry<float> _caliberScale;
         private readonly ConfigEntry<float> _caliberOffset;
         private readonly ConfigEntry<int> _fontSize;
+        
         private readonly ConfigEntry<bool> _lockPitch;
         private readonly ConfigEntry<float> _viewAngle;
 
@@ -27,6 +30,8 @@ namespace Wristimate
 
         public Behaviour()
         {
+            _enabled = Config.Bind("General", "Enabled", true, "Whether or not Wristimate should do anything.");
+            
             _totalScale = Config.Bind("Proportions", "TotalScale", 0.0075f, "The scale of the canvas.");
             _totalOffset = Config.Bind("Proportions", "TotalOffset", 0.075f, "The offset, relative to the center of your hand, to the canvas.");
             _caliberScale = Config.Bind("Proportions", "CaliberScale", 0.5f, "The scale, relative to the canvas, of the caliber subtext.");
@@ -36,10 +41,13 @@ namespace Wristimate
             _lockPitch = Config.Bind("Math", "LockPitch", true, "Whether or not the text should pitch up to your head.");
             _viewAngle = Config.Bind("Math", "ViewAngle", 25f, "The minimum angle (in degrees) from the magazine that you must be looking for the text to render.");
 
+            _enabled.SettingChanged += (_, _) => EnabledUpdated();
+            
             _totalScale.SettingChanged += (_, _) => TextUpdated();
             _totalOffset.SettingChanged += (_, _) => TextUpdated();
             _caliberScale.SettingChanged += (_, _) => TextUpdated();
             _caliberOffset.SettingChanged += (_, _) => TextUpdated();
+            
             _fontSize.SettingChanged += (_, _) => TextUpdated();
             _viewAngle.SettingChanged += (_, _) => ConeUpdated();
             
@@ -67,6 +75,14 @@ namespace Wristimate
             ConeUpdated();
 
             SceneManager.activeSceneChanged += (_, _) => Config.Reload();
+        }
+
+        private void EnabledUpdated()
+        {
+            if (!_enabled.Value)
+            {
+                _popup.gameObject.SetActive(false);
+            }
         }
 
         private void TextUpdated()
@@ -110,6 +126,8 @@ namespace Wristimate
 
         private void Update()
         {
+            if (!_enabled.Value) return;
+            
             MagData? data;
             Vector3 pos;
             {
