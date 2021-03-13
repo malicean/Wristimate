@@ -2,12 +2,12 @@
   "name": "Wristimate",
   "authors": [ "AshHat" ],
   "guid": "ash-hat.wristimate",
-  "require": "0.3",
+  "dependencies": {
+    "deli.core": "0.2.5"
+  },
   "version": "1.0.0",
-  "source_url": "https://github.com/ash-hat/Wristimate",
-  "assets": {
-    "setup": {
-      "Wristimate.dll": "deli:assembly"
-    }
+  "sourceUrl": "https://github.com/ash-hat/Wristimate",
+  "runtime": {
+    "Wristimate.dll": "assembly"
   }
 }
