@@ -5,7 +5,6 @@ using Deli.Setup;
 using FistVR;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using GM = FistVR.GM;
 
 namespace Wristimate
 {
