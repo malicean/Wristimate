@@ -39,7 +39,7 @@ namespace Wristimate
             _fontSize = Config.Bind("Proportions", "FontSize", 30, "The size of the text. Increasing this but decreasing scale will result in a higher-resolution text.");
 
             _lockPitch = Config.Bind("Math", "LockPitch", true, "Whether or not the text should pitch up to your head.");
-            _viewAngle = Config.Bind("Math", "ViewAngle", 25f, "The minimum angle (in degrees) from the magazine that you must be looking for the text to render.");
+            _viewAngle = Config.Bind("Math", "ViewAngle", 20f, "The minimum angle (in degrees) from your wrist that you must be looking for the text to render.");
 
             _enabled.SettingChanged += (_, _) => EnabledUpdated();
             
