@@ -164,9 +164,13 @@ namespace Wristimate
                 _amountText.text = ((float) mag.m_numRounds / mag.m_capacity) switch
                 {
                     > 1 => "WTF (> 1)",
-                    > 0.65f => "More than half",
-                    > 0.35f => "About half",
-                    >= 0 => "Less than half",
+                    > 55/60f => "Full",
+                    > 45/60f => "Full~",
+                    > 35/60f => "More than half",
+                    > 25/60f => "About half",
+                    > 15/60f => "Less than half",
+                    > 5/60f => "Empty~",
+                    >= 0 => "Empty",
                     < 0 => "WTF (< 0)",
                     _ => "WTF (other)"
                 };
