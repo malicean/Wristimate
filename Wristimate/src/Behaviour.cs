@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Configuration;
-using Deli.Setup;
+using Deli;
 using FistVR;
 using UnityEngine;
 using UnityEngine.SceneManagement;
