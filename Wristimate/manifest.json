@@ -1,7 +1,7 @@
 {
   "name": "Wristimate",
   "authors": [ "AshHat" ],
-  "guid": "ash-hat.wristimate",
+  "guid": "ash_hat.wristimate",
   "require": "0.3",
   "version": "1.0.0",
   "source_url": "https://github.com/ash-hat/Wristimate",
