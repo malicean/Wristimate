@@ -361,8 +361,4 @@ MigrationBackup/
 # VS Code
 .vscode/
 
-# Un-Ignore dependencies we can include in the repo
-![Ll]ibs/Deli.dll
-# Temporary workaround until Atlas is on Nuget
-![Ll]ibs/Atlas.dll
-![Ll]ibs/Atlas.xml
+Wristimate.deli
