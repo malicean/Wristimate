@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Configuration;
@@ -9,11 +10,22 @@ namespace Wristimate
 {
 	public class Behaviour : DeliBehaviour
 	{
+		private enum DisplayMode
+		{
+			Text,
+			RoundCount,
+			RoundCountAndCapacity,
+			PercentageFuzzy,
+			PercentagePrecise
+		}
+
 		private readonly Canvas _popup;
 		private readonly TextMesh _amountText;
 		private readonly TextMesh _caliberText;
 
 		private readonly ConfigEntry<bool> _enabled;
+		
+		private readonly ConfigEntry<DisplayMode> _displayMode;
 		
 		private readonly ConfigEntry<float> _totalScale;
 		private readonly ConfigEntry<float> _totalOffset;
@@ -23,14 +35,14 @@ namespace Wristimate
 		
 		private readonly ConfigEntry<bool> _lockPitch;
 		private readonly ConfigEntry<float> _viewAngle;
-		
-		private readonly ConfigEntry<int> _textType;
 
 		private float _viewDot;
 
 		public Behaviour()
 		{
 			_enabled = Config.Bind("General", "Enabled", true, "Whether or not Wristimate should do anything.");
+			
+			_displayMode = Config.Bind("General", "DisplayMode", DisplayMode.Text, "Changes the text which says how much ammo you have.");
 			
 			_totalScale = Config.Bind("Proportions", "TotalScale", 0.0075f, "The scale of the canvas.");
 			_totalOffset = Config.Bind("Proportions", "TotalOffset", 0.075f, "The offset, relative to the center of your hand, to the canvas.");
@@ -40,8 +52,6 @@ namespace Wristimate
 
 			_lockPitch = Config.Bind("Math", "LockPitch", true, "Whether or not the text should pitch up to your head.");
 			_viewAngle = Config.Bind("Math", "ViewAngle", 20f, "The minimum angle (in degrees) from your wrist that you must be looking for the text to render.");
-			
-			_textType = Config.Bind("Text Type", "TextType", 1, "Changes the text which says how much ammo you have.\n1 = Vague text (default), 2 = Vague percentages, 3 and 4 = Precise amount of rounds left (4 shows the total capacity of the magazine as well), 5 = Precise percentage");
 
 			_enabled.SettingChanged += (_, _) => EnabledUpdated();
 			
@@ -163,76 +173,38 @@ namespace Wristimate
 				var mag = data.Value.Magazine;
 				var wrist = data.Value.Wrist;
 
-				switch (_textType.Value)
+				float Percentage() => (float) mag.m_numRounds / mag.m_capacity;
+
+				_amountText.text = _displayMode.Value switch
 				{
-					case 1:
-						// Vague text, as in the original
-						_amountText.text = ((float) mag.m_numRounds / mag.m_capacity) switch
-						{
-							> 1 => "WTF (> 1)",
-							> 55/60f => "Full",
-							> 45/60f => "Full~",
-							> 35/60f => "More than half",
-							> 25/60f => "About half",
-							> 15/60f => "Less than half",
-							> 5/60f => "Empty~",
-							>= 0 => "Empty",
-							< 0 => "WTF (< 0)",
-							_ => "WTF (other)"
-						};
-						break;
-					case 2:
-						// Vague percentages
-						_amountText.text = ((float) mag.m_numRounds / mag.m_capacity) switch
-						{
-							> 1 => "101% (> 1)",
-							>= 1 => "100%",
-							> 9/10f => "~100%",
-							> 7/10f => "~80%",
-							> 5/10f => "~60%",
-							> 3/10f => "~40%",
-							> 1/10f => "~20%",
-							>= 0 => "0%",
-							< 0 => "-100% (< 0)",
-							_ => "???% (other)"
-						};
-						break;
-					case 3:
-						// Precise number
-						_amountText.text = mag.m_numRounds.ToString();
-						break;
-					case 4:
-						// Precise number with capacity
-						_amountText.text = mag.m_numRounds.ToString() + "/" + mag.m_capacity.ToString();
-						break;
-					case 5:
-						// Precise percentages
-						/* 
-						* This one was a bitch to get working right and I probably missed obvious things during my calculations, for some reason when using Mathf.Round, mag.m_capacity seemed to be getting rounded mid-calculation, so when, say, we would be dividing 100 by a 30 round magazine, that would normally result in the end being 3.3333(...), but instead it would get rounded down to 3, despite as far as I can tell it shouldn't be doing that? I really would't know, but it'd end up then multiplying the incorrect rounded number by the amount of rounds left, so a full 30 round magazine would say it had 90% in it despite being totally full... It's weird, man, either way, rounding it in a separate variable should... Probably resolve this issue? I have no idea, further testing required.
-						* It didn't work, I ended up having to f***ing use 10000 rather than 100 then multiply the end result by 0.01, it's not TOTALLY precise but it shouldn't make a difference to the end user anyways considering it gets rounded to an integer.
-						* - Jessica
-						*/
-						float precisepercentage = (float)(((10000 / mag.m_capacity) * mag.m_numRounds) * 0.01);
-						float whydoihavetodothisbulls = Mathf.Round(precisepercentage);
-						_amountText.text = whydoihavetodothisbulls.ToString() + "%";
-						break;
-					default:
-						// Vague text, as in the original
-						_amountText.text = ((float) mag.m_numRounds / mag.m_capacity) switch
-						{
-							> 1 => "WTF (> 1)",
-							> 55/60f => "Full",
-							> 45/60f => "Full~",
-							> 35/60f => "More than half",
-							> 25/60f => "About half",
-							> 15/60f => "Less than half",
-							> 5/60f => "Empty~",
-							>= 0 => "Empty",
-							< 0 => "WTF (< 0)",
-							_ => "WTF (other)"
-						};
-						break;
-				}
+					DisplayMode.Text => Percentage() switch
+					{
+						> 55/60f => "Full",
+						> 45/60f => "Full~",
+						> 35/60f => "More than half",
+						> 25/60f => "About half",
+						> 15/60f => "Less than half",
+						> 5/60f => "Empty~",
+						>= 0 => "Empty",
+						_ => throw new NotSupportedException("Invalid ammo percentage")
+					},
+					DisplayMode.PercentageFuzzy => Percentage() switch
+					{
+						1 => "100%",
+						> 9/10f => "~100%",
+						> 7/10f => "~80%",
+						> 5/10f => "~60%",
+						> 3/10f => "~40%",
+						> 1/10f => "~20%",
+						> 0 => "~0%",
+						0 => "0%",
+						_ => throw new NotSupportedException("Invalid ammo percentage")
+					},
+					DisplayMode.PercentagePrecise => $"{Percentage():F2}%",
+					DisplayMode.RoundCount => mag.m_numRounds.ToString(),
+					DisplayMode.RoundCountAndCapacity => $"{mag.m_numRounds}/{mag.m_capacity}",
+					_ => throw new NotSupportedException("Invalid display mode")
+				};
 
 				{
 					var round = mag.LoadedRounds?.FirstOrDefault();
