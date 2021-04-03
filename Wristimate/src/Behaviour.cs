@@ -173,7 +173,7 @@ namespace Wristimate
 				var mag = data.Value.Magazine;
 				var wrist = data.Value.Wrist;
 
-				float Percentage() => (float)(mag.m_numRounds / mag.m_capacity) * 100;
+				float Percentage() => (float)((mag.m_numRounds / mag.m_capacity) * 100);
 
 				_amountText.text = _displayMode.Value switch
 				{
