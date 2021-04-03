@@ -173,7 +173,8 @@ namespace Wristimate
 				var mag = data.Value.Magazine;
 				var wrist = data.Value.Wrist;
 
-				float Percentage() => (float)((mag.m_numRounds / mag.m_capacity) * 100);
+				// This is supposed to be [0, 1], not [0, 100]
+				float Percentage() => (float) mag.m_numRounds / mag.m_capacity;
 
 				_amountText.text = _displayMode.Value switch
 				{
@@ -200,9 +201,9 @@ namespace Wristimate
 						0 => "0%",
 						_ => throw new NotSupportedException("Invalid ammo percentage")
 					},
-					DisplayMode.PercentagePrecise => $"{Percentage():F2}%",
+					DisplayMode.PercentagePrecise => Percentage().ToString("P2"),
 					DisplayMode.RoundCount => mag.m_numRounds.ToString(),
-					DisplayMode.RoundCountAndCapacity => $"{mag.m_numRounds}/{mag.m_capacity}",
+					DisplayMode.RoundCountAndCapacity => "{mag.m_numRounds}/{mag.m_capacity}",
 					_ => throw new NotSupportedException("Invalid display mode")
 				};
 
