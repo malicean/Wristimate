@@ -1,20 +1,31 @@
-﻿using System.Collections.Generic;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using BepInEx.Configuration;
 using Deli.Setup;
 using FistVR;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-
 namespace Wristimate
 {
 	public class Behaviour : DeliBehaviour
 	{
+		private enum DisplayMode
+		{
+			Text,
+			RoundCount,
+			RoundCountAndCapacity,
+			PercentageFuzzy,
+			PercentagePrecise
+		}
+
 		private readonly Canvas _popup;
 		private readonly TextMesh _amountText;
 		private readonly TextMesh _caliberText;
 
 		private readonly ConfigEntry<bool> _enabled;
+		
+		private readonly ConfigEntry<DisplayMode> _displayMode;
 		
 		private readonly ConfigEntry<float> _totalScale;
 		private readonly ConfigEntry<float> _totalOffset;
@@ -30,6 +41,8 @@ namespace Wristimate
 		public Behaviour()
 		{
 			_enabled = Config.Bind("General", "Enabled", true, "Whether or not Wristimate should do anything.");
+			
+			_displayMode = Config.Bind("General", "DisplayMode", DisplayMode.Text, "Changes the text which says how much ammo you have.");
 			
 			_totalScale = Config.Bind("Proportions", "TotalScale", 0.0075f, "The scale of the canvas.");
 			_totalOffset = Config.Bind("Proportions", "TotalOffset", 0.075f, "The offset, relative to the center of your hand, to the canvas.");
@@ -160,18 +173,38 @@ namespace Wristimate
 				var mag = data.Value.Magazine;
 				var wrist = data.Value.Wrist;
 
-				_amountText.text = ((float) mag.m_numRounds / mag.m_capacity) switch
+				// This is supposed to be [0, 1], not [0, 100]
+				float Percentage() => (float) mag.m_numRounds / mag.m_capacity;
+
+				_amountText.text = _displayMode.Value switch
 				{
-					> 1 => "WTF (> 1)",
-					> 55/60f => "Full",
-					> 45/60f => "Full~",
-					> 35/60f => "More than half",
-					> 25/60f => "About half",
-					> 15/60f => "Less than half",
-					> 5/60f => "Empty~",
-					>= 0 => "Empty",
-					< 0 => "WTF (< 0)",
-					_ => "WTF (other)"
+					DisplayMode.Text => Percentage() switch
+					{
+						> 55/60f => "Full",
+						> 45/60f => "Full~",
+						> 35/60f => "More than half",
+						> 25/60f => "About half",
+						> 15/60f => "Less than half",
+						> 5/60f => "Empty~",
+						>= 0 => "Empty",
+						_ => throw new NotSupportedException("Invalid ammo percentage")
+					},
+					DisplayMode.PercentageFuzzy => Percentage() switch
+					{
+						1 => "100%",
+						> 9/10f => "~100%",
+						> 7/10f => "~80%",
+						> 5/10f => "~60%",
+						> 3/10f => "~40%",
+						> 1/10f => "~20%",
+						> 0 => "~0%",
+						0 => "0%",
+						_ => throw new NotSupportedException("Invalid ammo percentage")
+					},
+					DisplayMode.PercentagePrecise => Percentage().ToString("P2"),
+					DisplayMode.RoundCount => mag.m_numRounds.ToString(),
+					DisplayMode.RoundCountAndCapacity => "{mag.m_numRounds}/{mag.m_capacity}",
+					_ => throw new NotSupportedException("Invalid display mode")
 				};
 
 				{
