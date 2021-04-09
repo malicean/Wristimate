@@ -24,15 +24,15 @@ namespace Wristimate
 		private readonly TextMesh _caliberText;
 
 		private readonly ConfigEntry<bool> _enabled;
-		
+
 		private readonly ConfigEntry<DisplayMode> _displayMode;
-		
+
 		private readonly ConfigEntry<float> _totalScale;
 		private readonly ConfigEntry<float> _totalOffset;
 		private readonly ConfigEntry<float> _caliberScale;
 		private readonly ConfigEntry<float> _caliberOffset;
 		private readonly ConfigEntry<int> _fontSize;
-		
+
 		private readonly ConfigEntry<bool> _lockPitch;
 		private readonly ConfigEntry<float> _viewAngle;
 
@@ -41,9 +41,9 @@ namespace Wristimate
 		public Behaviour()
 		{
 			_enabled = Config.Bind("General", "Enabled", true, "Whether or not Wristimate should do anything.");
-			
+
 			_displayMode = Config.Bind("General", "DisplayMode", DisplayMode.Text, "Changes the text which says how much ammo you have.");
-			
+
 			_totalScale = Config.Bind("Proportions", "TotalScale", 0.0075f, "The scale of the canvas.");
 			_totalOffset = Config.Bind("Proportions", "TotalOffset", 0.075f, "The offset, relative to the center of your hand, to the canvas.");
 			_caliberScale = Config.Bind("Proportions", "CaliberScale", 0.5f, "The scale, relative to the canvas, of the caliber subtext.");
@@ -54,19 +54,19 @@ namespace Wristimate
 			_viewAngle = Config.Bind("Math", "ViewAngle", 20f, "The minimum angle (in degrees) from your wrist that you must be looking for the text to render.");
 
 			_enabled.SettingChanged += (_, _) => EnabledUpdated();
-			
+
 			_totalScale.SettingChanged += (_, _) => TextUpdated();
 			_totalOffset.SettingChanged += (_, _) => TextUpdated();
 			_caliberScale.SettingChanged += (_, _) => TextUpdated();
 			_caliberOffset.SettingChanged += (_, _) => TextUpdated();
-			
+
 			_fontSize.SettingChanged += (_, _) => TextUpdated();
 			_viewAngle.SettingChanged += (_, _) => ConeUpdated();
-			
+
 			{
 				var root = new GameObject("Display");
 				root.transform.parent = transform;
-				
+
 				var amountText = new GameObject("Amount Text");
 				var caliberText = new GameObject("Caliber Text");
 				amountText.transform.parent = root.transform;
@@ -74,7 +74,7 @@ namespace Wristimate
 
 				_popup = root.AddComponent<Canvas>();
 				_popup.renderMode = RenderMode.WorldSpace;
-				
+
 				_amountText = amountText.AddComponent<TextMesh>();
 				_amountText.anchor = TextAnchor.UpperCenter;
 
@@ -100,7 +100,7 @@ namespace Wristimate
 		private void TextUpdated()
 		{
 			_popup.transform.localScale = _totalScale.Value * Vector3.one;
-			
+
 			_amountText.fontSize = _fontSize.Value;
 			_caliberText.fontSize = _fontSize.Value;
 
@@ -130,7 +130,7 @@ namespace Wristimate
 					var trans = h.transform;
 					var interactable = h.CurrentInteractable;
 					var mag = (interactable != null ? interactable.GetComponent<FVRFireArmMagazine>() : null)!;
-					
+
 					return new MagData(mag, trans.position - _totalOffset.Value * trans.forward);
 				})
 				.Where(m => m.Magazine != null);
@@ -139,7 +139,7 @@ namespace Wristimate
 		private void Update()
 		{
 			if (!_enabled.Value) return;
-			
+
 			MagData? data;
 			Vector3 pos;
 			{
@@ -166,7 +166,7 @@ namespace Wristimate
 				_popup.gameObject.SetActive(false);
 				return;
 			}
-			
+
 			_popup.gameObject.SetActive(true);
 
 			{
@@ -203,7 +203,7 @@ namespace Wristimate
 					},
 					DisplayMode.PercentagePrecise => Percentage().ToString("P2"),
 					DisplayMode.RoundCount => mag.m_numRounds.ToString(),
-					DisplayMode.RoundCountAndCapacity => "{mag.m_numRounds}/{mag.m_capacity}",
+					DisplayMode.RoundCountAndCapacity => $"{mag.m_numRounds}/{mag.m_capacity}",
 					_ => throw new NotSupportedException("Invalid display mode")
 				};
 
@@ -232,12 +232,12 @@ namespace Wristimate
 
 					var dir = offset.normalized;
 					var rot = Quaternion.LookRotation(dir);
-					
+
 					popupTransform.rotation = rot;
 				}
 			}
 		}
-		
+
 		private readonly struct MagDataDot
 		{
 			public MagDataDot(MagData data, float dot)
@@ -245,7 +245,7 @@ namespace Wristimate
 				Data = data;
 				Dot = dot;
 			}
-			
+
 			public MagData Data { get; }
 			public float Dot { get; }
 		}
