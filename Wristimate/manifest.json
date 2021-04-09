@@ -6,7 +6,7 @@
   ],
   "guid": "ash_hat.wristimate",
   "require": "0.3",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "source_url": "https://github.com/ash-hat/Wristimate",
   "assets": {
     "setup": {
