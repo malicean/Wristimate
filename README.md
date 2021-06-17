@@ -6,10 +6,7 @@ An H3VR mod that displays imprecise information about magazines on the wrist of 
 with, and only happens when you look at your wrist. It currently supports displaying the percentage of remaining rounds, as well as the caliber
 and class of the next round to be fed.
 
-## Installation
-Requires [Deli 0.3](https://github.com/Deli-Collective/Deli/releases).
+## Manual Installation
+Requires [BepInEx 5.4.x](https://github.com/BepInEx/BepInEx)
 
-Download [the latest release of Wristimate](https://github.com/ash-hat/Wristimate/releases/latest) and place `Wristimate.deli` into your `Deli/mods` folder.
-
-## Uninstallation
-Delete `Wristimate.deli` from the `Deli/mods` folder and `ash_hat.wristimate.cfg` from the `Deli/configs` folder.
+Download and open [AshHat-Wristimate.zip](https://github.com/ash-hat/Wristimate/releases/latest), then drag `Wristimate.dll` within into the `h3vr/bepinex/plugins/` directory
