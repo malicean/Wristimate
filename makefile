@@ -6,7 +6,7 @@ GIT_HASH         = $(shell git rev-parse HEAD)
 AUTHOR           = AshHat
 PROJECT          = Wristimate
 PACKAGE          = $(AUTHOR)-$(PROJECT).zip
-CONTENTS         = manifest.json $(PROJECT).dll
+CONTENTS         = icon.png manifest.json $(PROJECT).dll
 
 CONFIG           = Release
 FRAMEWORK        = net35
@@ -20,6 +20,7 @@ build:
 	dotnet build --configuration $(CONFIG) --framework $(FRAMEWORK) $(BUILD_PROPERTIES)
 
 $(PACKAGE): build
+	cp README.MD $(PROJECT)/bin/$(CONFIG)/$(FRAMEWORK)/
 	zip -9j $@ $(addprefix $(PROJECT)/bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS))
 
 clean:
