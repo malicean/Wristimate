@@ -27,5 +27,5 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
-          name: Wristimate
-          path: Wristimate.deli
+          name: AshHat-Wristimate
+          path: AshHat-Wristimate.zip
