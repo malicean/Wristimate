@@ -20,7 +20,6 @@ build:
 	dotnet build --configuration $(CONFIG) --framework $(FRAMEWORK) $(BUILD_PROPERTIES)
 
 $(PACKAGE): build
-	cp README.MD $(PROJECT)/bin/$(CONFIG)/$(FRAMEWORK)/
 	zip -9j $@ $(addprefix $(PROJECT)/bin/$(CONFIG)/$(FRAMEWORK)/,$(CONTENTS))
 
 clean:
