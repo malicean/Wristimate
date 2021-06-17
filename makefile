@@ -3,8 +3,9 @@ SHELL            = /bin/bash
 GIT_BRANCH       = $(shell git rev-parse --abbrev-ref HEAD)
 GIT_HASH         = $(shell git rev-parse HEAD)
 
+AUTHOR           = AshHat
 PROJECT          = Wristimate
-PACKAGE          = $(PROJECT).deli
+PACKAGE          = $(AUTHOR)-$(PROJECT).zip
 CONTENTS         = manifest.json $(PROJECT).dll
 
 CONFIG           = Release

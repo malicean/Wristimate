@@ -1,15 +1,17 @@
+using BepInEx;
+using BepInEx.Configuration;
+using FistVR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BepInEx.Configuration;
-using Deli.Setup;
-using FistVR;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Wristimate
 {
-	public class Behaviour : DeliBehaviour
+	[BepInPlugin("ash_hat.Wristimate", "Wristimate", "1.3.0")]
+	[BepInProcess("h3vr.exe")]
+	public class Behaviour : BaseUnityPlugin
 	{
 		private enum DisplayMode
 		{
@@ -130,9 +132,9 @@ namespace Wristimate
 				{
 					var trans = h.transform;
 					var interactable = h.CurrentInteractable;
-					var mag = (interactable != null ? interactable.GetComponent<FVRFireArmMagazine>() : null)!;
+					var mag = (interactable?.GetComponent<FVRFireArmMagazine>())!;
 
-					return new MagData(mag, trans.position - _totalOffset.Value * trans.forward);
+					return new MagData(mag, trans.position - (_totalOffset.Value * trans.forward));
 				})
 				.Where(m => m.Magazine != null);
 		}
@@ -158,7 +160,7 @@ namespace Wristimate
 					})
 					.Where(x => x.Dot > _viewDot)
 					.OrderByDescending(x => x.Dot)
-					.Select(x => (MagData?) x.Data)
+					.Select(x => (MagData?)x.Data)
 					.FirstOrDefault();
 			}
 
@@ -175,29 +177,29 @@ namespace Wristimate
 				var wrist = data.Value.Wrist;
 
 				// This is supposed to be [0, 1], not [0, 100]
-				float Percentage() => (float) mag.m_numRounds / mag.m_capacity;
+				float Percentage() => (float)mag.m_numRounds / mag.m_capacity;
 
 				_amountText.text = _displayMode.Value switch
 				{
 					DisplayMode.Text => Percentage() switch
 					{
-						> 55/60f => "Full",
-						> 45/60f => "Full~",
-						> 35/60f => "More than half",
-						> 25/60f => "About half",
-						> 15/60f => "Less than half",
-						> 5/60f => "Empty~",
+						> 55 / 60f => "Full",
+						> 45 / 60f => "Full~",
+						> 35 / 60f => "More than half",
+						> 25 / 60f => "About half",
+						> 15 / 60f => "Less than half",
+						> 5 / 60f => "Empty~",
 						>= 0 => "Empty",
 						_ => throw new NotSupportedException("Invalid ammo percentage")
 					},
 					DisplayMode.PercentageFuzzy => Percentage() switch
 					{
 						1 => "100%",
-						> 9/10f => "~100%",
-						> 7/10f => "~80%",
-						> 5/10f => "~60%",
-						> 3/10f => "~40%",
-						> 1/10f => "~20%",
+						> 9 / 10f => "~100%",
+						> 7 / 10f => "~80%",
+						> 5 / 10f => "~60%",
+						> 3 / 10f => "~40%",
+						> 1 / 10f => "~20%",
 						> 0 => "~0%",
 						0 => "0%",
 						_ => throw new NotSupportedException("Invalid ammo percentage")
