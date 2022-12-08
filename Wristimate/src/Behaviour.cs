@@ -1,15 +1,16 @@
+using BepInEx;
+using BepInEx.Configuration;
+using FistVR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BepInEx.Configuration;
-using Deli.Setup;
-using FistVR;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Wristimate
 {
-	public class Behaviour : DeliBehaviour
+	[BepInPlugin("ash_hat.wristimate", "Wristimate", "1.1.0")]
+	public class Behaviour : BaseUnityPlugin
 	{
 		private enum DisplayMode
 		{
