@@ -168,11 +168,16 @@ namespace Wristimate
 				_popup.gameObject.SetActive(false);
 				return;
 			}
-
-			_popup.gameObject.SetActive(true);
+			
+			var mag = data.Value.Magazine;
+			if (mag.m_capacity == 0)
+			{
+				_popup.gameObject.SetActive(false);
+				return;
+			}
 
 			{
-				var mag = data.Value.Magazine;
+				_popup.gameObject.SetActive(true);
 				var wrist = data.Value.Wrist;
 
 				// This is supposed to be [0, 1], not [0, 100]
