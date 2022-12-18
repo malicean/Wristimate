@@ -1,0 +1,9 @@
+{
+  "name": "Wristimate",
+  "version_number": "1.2.3",
+  "dependencies": [
+    "BepInEx-BepInExPack_H3VR-5.4.1700"
+  ],
+  "description": "Displays information about the held magazine on the wrist of your hand. Preciseness of information is configurable.",
+  "website_url": "https://github.com/ash-zsh/Wristimate"
+}

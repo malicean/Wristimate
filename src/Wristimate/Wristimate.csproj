@@ -1,18 +1,11 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net35</TargetFramework>
         <LangVersion>9</LangVersion>
         <Nullable>enable</Nullable>
-        <RootNamespace>AmmoDisplay</RootNamespace>
     </PropertyGroup>
-    
-    <ItemGroup>
-      <None Update="manifest.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-    </ItemGroup>
-    
+   
     <ItemGroup>
         
       <PackageReference Include="BepInEx.Core" Version="5.4.17" />
